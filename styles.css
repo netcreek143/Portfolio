@@ -119,6 +119,7 @@ body {
     border-radius: 50%;
     cursor: pointer;
     transition: var(--transition);
+    color: var(--text-primary);
 }
 
 .theme-toggle:hover {
@@ -375,6 +376,13 @@ section {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.about-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
 }
 
 .stat-item {
@@ -504,8 +512,16 @@ section {
 .skill-item span {
     font-size: 1.3rem;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     display: block;
+}
+
+.skill-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    min-height: 3rem;
 }
 
 .skill-bar {
