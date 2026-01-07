@@ -16,6 +16,9 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
+    <!-- ✅ PDF Libraries - Load BEFORE script.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -78,7 +81,7 @@
               target="_blank"
             >
               <i class="fab fa-github"></i>
-              <span>View Projects</span>
+              <span>View github</span>
             </a>
           </div>
         </div>
@@ -89,7 +92,7 @@
       </div>
     </section>
 
-    <!-- About Section -->
+    <!-- About Section (Resume Content) -->
     <section id="about" class="about">
       <div class="container">
         <div class="section-header">
@@ -120,11 +123,12 @@
               <div class="stat-label">Skills</div>
             </div>
           </div>
+          <!-- ✅ FIXED PDF Download Button -->
           <div class="about-actions">
-            <a href="resume.pdf" class="btn btn-primary" download>
+            <button id="downloadResume" class="btn btn-primary">
               <i class="fas fa-download"></i>
               <span>Download Resume (PDF)</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -151,7 +155,7 @@
                 <a
                   href="https://github.com/netcreek143/pack-my-cake-guvi-project"
                   target="_blank"
-                  >Pack My Cake</a
+                >Pack My Cake</a
                 >
               </h3>
               <p>
@@ -192,7 +196,7 @@
                 <a
                   href="https://github.com/netcreek143/taskmanager_project"
                   target="_blank"
-                  >Task Manager</a
+                >Task Manager</a
                 >
               </h3>
               <p>
@@ -232,7 +236,7 @@
                 <a
                   href="https://github.com/netcreek143/housemate"
                   target="_blank"
-                  >HouseMate</a
+                >HouseMate</a
                 >
               </h3>
               <p>
@@ -416,6 +420,77 @@
       </div>
     </section>
 
+    <!-- ✅ PDF Download Script (Inline - Runs after DOM loads) -->
+    <script>
+      // PDF Download Function - Fixed for .pdf extension
+      document.addEventListener('DOMContentLoaded', function() {
+        const downloadBtn = document.getElementById('downloadResume');
+        
+        if (downloadBtn) {
+          downloadBtn.addEventListener('click', async function() {
+            try {
+              // Target the entire page or just #about section for resume content
+              const element = document.body;
+              
+              // Show loading state
+              const originalText = downloadBtn.innerHTML;
+              downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+              downloadBtn.disabled = true;
+              
+              // Generate PDF using html2canvas + jsPDF
+              const canvas = await html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                width: document.documentElement.scrollWidth,
+                height: document.documentElement.scrollHeight
+              });
+              
+              const imgData = canvas.toDataURL('image/png');
+              const { jsPDF } = window.jspdf;
+              const pdf = new jsPDF('p', 'mm', 'a4');
+              
+              // Calculate dimensions for A4
+              const imgWidth = 210;
+              const pageHeight = 295;
+              const imgHeight = (canvas.height * imgWidth) / canvas.width;
+              let heightLeft = imgHeight;
+              let position = 0;
+              
+              // Add first page
+              pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+              heightLeft -= pageHeight;
+              
+              // Add more pages if needed
+              while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+              }
+              
+              // ✅ Save as PDF with explicit filename
+              pdf.save('Suriya-Fullstack-Resume.pdf');
+              
+              // Reset button
+              setTimeout(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+              }, 1000);
+              
+            } catch (error) {
+              console.error('PDF generation failed:', error);
+              alert('PDF generation failed. Please try again or use Ctrl+P to save as PDF.');
+              downloadBtn.innerHTML = originalText;
+              downloadBtn.disabled = false;
+            }
+          });
+        }
+      });
+    </script>
+
+    <!-- Your existing script.js -->
     <script src="script.js"></script>
   </body>
 </html>
